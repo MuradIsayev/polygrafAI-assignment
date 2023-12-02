@@ -10,9 +10,11 @@ export const multerOptions = {
       callback(null, randomName + extname(file.originalname));
     },
   }),
+
   limits: {
     fileSize: 1024 * 1024 * 20, // Set maximum file size (20 MB)
   },
+
   fileFilter: (req, file, callback) => {
     // Validate the file type of the uploaded file (only MP4 videos are allowed)
     if (file.mimetype === 'video/mp4') {
