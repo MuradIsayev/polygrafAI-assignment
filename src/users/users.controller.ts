@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -14,5 +16,10 @@ export class UsersController {
   @Get(':email')
   findOne(@Param('email') email: string) {
     return this.usersService.findOneByEmail(email);
+  }
+
+  @Get('me')
+  getUserInfo(@GetUser() user: User) {
+    return this.usersService.getUserInfo(user);
   }
 }
