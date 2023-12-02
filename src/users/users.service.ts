@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  MethodNotAllowedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -9,15 +14,37 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    const foundUser = await this.usersRepository.findOneBy({
+      email: createUserDto.email,
+    });
+
+    if (foundUser) {
+      throw new MethodNotAllowedException(
+        `User with email ${createUserDto.email} already exists`,
+      );
+    }
+
+    const user = this.usersRepository.create(createUserDto);
+
+    if (!user) throw new BadRequestException('User could not be created');
+
+    await this.usersRepository.save(user);
+
+    return true;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findOneByEmail(email: string) {
+    const user = await this.usersRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async getUserInfo(user: User) {
+    return await this.findOneByEmail(user.email);
   }
 }
