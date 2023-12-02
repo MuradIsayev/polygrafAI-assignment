@@ -11,4 +11,5 @@ export const config = () => ({
     entities,
     synchronize: true,
   },
+  jwtSecret: process.env.JWT_SECRET,
 });
